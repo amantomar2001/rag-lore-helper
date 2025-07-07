@@ -168,17 +168,21 @@ def navigate_to_target(query, query2):
         soup = BeautifulSoup(html, 'html.parser')
         main_content = soup.find('main')
         content_html = str(main_content) if main_content else html
-        title_elem = soup.find('h1') or soup.find('title')
-        title = title_elem.get_text().strip() if title_elem else 'page'
-        title = re.sub(r'[^\w\s-]', '_', title)
-        title = re.sub(r'\s+', '_', title).strip('_')
         
-        print(f"Line {__line__()}: Saving HTML with title: {title}")
+        # --- STANDARDIZED FILE NAMING ---
+        # Sanitize game name for the folder
         game_folder = re.sub(r'[^\w\s-]', '_', query).strip()
         game_folder = re.sub(r'\s+', '_', game_folder).strip('_')
         game_dir = os.path.join(RAW_DATA_DIR, game_folder)
         os.makedirs(game_dir, exist_ok=True)
-        file_path = os.path.join(game_dir, f'{title}.html')
+
+        # Sanitize character name (query2) for the filename
+        char_filename = re.sub(r'[^\w\s-]', '_', query2.strip()).strip('_')
+        char_filename = re.sub(r'\s+', '_', char_filename)
+        
+        file_path = os.path.join(game_dir, f'{char_filename}.html')
+        print(f"Line {__line__()}: Saving HTML to standardized path: {file_path}")
+
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content_html)
         print(f"Line {__line__()}: HTML saved at {file_path}")
